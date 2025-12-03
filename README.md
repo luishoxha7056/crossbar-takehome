@@ -135,7 +135,7 @@ version: "3.9"
 
 services:
   web3-api:
-    image: ghcr.io/luishoxha7056/crossbar-takehome-api:latest
+    image: ghcr.io/luishoxha7056/crossbar-takehome-web:latest
     container_name: web3-api
     environment:
       RPC_URL: "https://ethereum.publicnode.com"
@@ -185,7 +185,7 @@ services:
     restart: unless-stopped
 
   web3-api:
-    image: ghcr.io/luishoxha7056/crossbar-takehome-api:latest
+    image: ghcr.io/luishoxha7056/crossbar-takehome-web:latest
     container_name: web3-api
     environment:
       RPC_URL: "https://ethereum.publicnode.com"
@@ -227,7 +227,7 @@ The build and deploy pipeline is automated:
 
 This setup provides a simple continuous deployment flow with minimal configuration.
 
----
+
 ## Reflection & Improvements
 
 ### 1. What trade-offs did you make in your design?
