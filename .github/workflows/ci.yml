@@ -1,0 +1,64 @@
+name: Build & Push Docker Image
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}-web:latest
+          docker build -t $IMAGE_NAME .
+
+      - name: Push Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}-web:latest
+          docker push $IMAGE_NAME
+
+
+
+
+  deploy:
+    needs: build 
+    runs-on: self-hosted   # This uses your server runner
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # If you pull image from GHCR, login (optional if your image is public)
+      - name: Login to GHCR
+        if: ${{ github.repository_owner != '' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy with Docker Compose  
+        working-directory: /home/deployer/projects/hw
+        run: |
+          docker compose pull || true
+          docker compose down && docker compose up -d --remove-orphans
+      
